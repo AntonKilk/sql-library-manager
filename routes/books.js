@@ -13,27 +13,61 @@ function asyncHandler(cb){
   }
 }
 
-
-// get / - Home route should redirect to the /books route.
-// router.get('/', function(req, res, next) {
-//   res.redirect("/books")
-// });
+// GET /books - Shows the full list of books.
 router.get('/', asyncHandler(async (req, res) => {
-  const books = await Book.findAll( { order: [["createdAt", "DESC"]] });
-  res.render("index", { books });
+  const books = await Book.findAll( { order: [["id", "DESC"]] });
+  res.render("books", { books, title: "Books" });
 }));
 
-// get /books - Shows the full list of books.
 
-// get /books/new - Shows the create new book form.
+// GET /books/new - Create new book 
+router.get('/new', (req, res) => {
+  res.render("books/new", { title: "New Book" });
+});
 
-// post /books/new - Posts a new book to the database.
+// POST /books/new - Post new book to the database.
+router.post('/', asyncHandler(async (req, res) => {
+  await Book.create(req.body);
+  res.redirect("/books");
+}));
 
-// get /books/:id - Shows book detail form.
+// GET /books/:id - Shows book detail form.
+
+router.get("/:id", asyncHandler(async (req, res) => {
+  const book = await Book.findByPk(req.params.id)
+  console.log("Getting:")
+  console.log(book.toJSON())
+  if(book) {
+  res.render("books/update", { book, title: book.title });
+  } else {
+    res.sendStatus(404);
+  } 
+}));
 
 // post /books/:id - Updates book info in the database.
+router.post('/:id', asyncHandler(async (req, res) => {
+  const book = await Book.findByPk(req.params.id);
+  console.log("Updating:")
+  console.log(book.toJSON())
+  if(book) {
+  await book.update(req.body);
+  res.redirect("/books");
+  } else {
+    res.sendStatus(404);
+  }
+}));
 
 // post /books/:id/delete - Deletes a book. Careful, this can’t be undone. 
-// It can be helpful to create a new “test” book to test deleting.
+router.post('/:id', asyncHandler(async (req ,res) => {
+  const book = await Book.findByPk(req.params.id);
+  console.log("Deleting:")
+  console.log(book.toJSON())
+  if(book) {
+  await book.destroy();
+  res.redirect("/books");
+  } else {
+    res.sendStatus(404);
+  }
+}));
 
 module.exports = router;
