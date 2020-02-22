@@ -22,7 +22,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // GET /books/new - Create new book 
 router.get('/new', (req, res) => {
-  res.render("books/new", { title: "New Book" });
+  res.render("books/new-book", { title: "New Book" });
 });
 
 // POST /books/new - Post new book to the database.
@@ -32,13 +32,10 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 // GET /books/:id - Shows book detail form.
-
 router.get("/:id", asyncHandler(async (req, res) => {
   const book = await Book.findByPk(req.params.id)
-  console.log("Getting:")
-  console.log(book.toJSON())
   if(book) {
-  res.render("books/update", { book, title: book.title });
+  res.render("books/update-book", { book, title: book.title });
   } else {
     res.sendStatus(404);
   } 
@@ -47,8 +44,6 @@ router.get("/:id", asyncHandler(async (req, res) => {
 // post /books/:id - Updates book info in the database.
 router.post('/:id', asyncHandler(async (req, res) => {
   const book = await Book.findByPk(req.params.id);
-  console.log("Updating:")
-  console.log(book.toJSON())
   if(book) {
   await book.update(req.body);
   res.redirect("/books");
@@ -58,10 +53,8 @@ router.post('/:id', asyncHandler(async (req, res) => {
 }));
 
 // post /books/:id/delete - Deletes a book. Careful, this can’t be undone. 
-router.post('/:id', asyncHandler(async (req ,res) => {
+router.post('/:id/delete', asyncHandler(async (req ,res) => {
   const book = await Book.findByPk(req.params.id);
-  console.log("Deleting:")
-  console.log(book.toJSON())
   if(book) {
   await book.destroy();
   res.redirect("/books");
